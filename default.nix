@@ -16,7 +16,7 @@
 		src = fetchFromGitHub {
 			owner = "alyosha-tas";
 			repo = "GBAHawk";
-			rev = "0ef5f754e47b38a2850a6ede600477dd388ab8b9";
+			rev = "6a32862613f85642bf6937d47efb8554d64de829"; # `441f6bcca^`, where `441f6bcca` is the commit that removed the managed implementations
 			postFetch = ''
 				cp -t $out/Assets/dll '${mainBizHawkRepo}/Assets/dll/libblip_buf.so'
 				touch $out/Assets/GBAHawkMono.sh
@@ -45,7 +45,7 @@
 				sed '/static void CheckLib/i\\t\t\tif (OSTC.IsUnixHost) { AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve; return; } // for Unix, skip everything else and just wire up the event handler' \
 					-i $out/src/BizHawk.Client.EmuHawk/Program.cs
 			'';
-			hash = "sha256-v1omldYQDLIdpcN754afEJ7hbb3fqtY+rBWN/dCg7lM=";
+			hash = "sha256-yglOohdyB8qDbrkJif+ytlugeq6ntC/OAcrFWBaONCc=";
 		};
 		needsLibGLVND = true;
 		nugetDeps = ./deps.nix;
@@ -57,14 +57,14 @@
 			"slimDX"
 			"systemDataSqliteDropIn"
 		];
-	}) // { version = "2.1.3"; };
+	}) // { version = "2.2.0"; }; # commit is from before the 2.2.0 tag, but it self-reports as this
 	hawkAttrs = import mainBizHawkRepo {
 		inherit pkgs system;
 		doCheck = false;
 	};
 in hawkAttrs.buildEmuHawkInstallableFor {
 	bizhawkAssemblies = (hawkAttrs.buildAssembliesFor hawkSourceInfo).overrideAttrs (oldAttrs: {
-		version = "2.1.3+0ef5f754e";
+		version = "2.1.3+6a3286261";
 		postPatch = builtins.replaceStrings [ "EmuHawk.csproj" ] [ "GBAHawk.csproj" ] oldAttrs.postPatch;
 		installPhase = let
 			insertionPoint = "cp -avT Assets $assets";
